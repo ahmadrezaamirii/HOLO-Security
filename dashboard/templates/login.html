@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOLO SECURITY Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+    <main class="login-shell">
+        <section class="product-panel">
+            <div class="brand-lockup">
+                <span class="brand-mark">HS</span>
+                <div>
+                    <strong>HOLO SECURITY</strong>
+                    <small>Enterprise Command Center</small>
+                </div>
+            </div>
+            <h1>Network security operations for web, mobile, and managed enterprise environments.</h1>
+            <p>Real-time ARP spoofing detection, endpoint blocking, alert analytics, and executive reporting in one deployable dashboard.</p>
+        </section>
+
+        <section class="login-card" aria-label="Administrator sign in">
+            <div class="login-header">
+                <p class="eyebrow">Secure Access</p>
+                <h2>Sign in</h2>
+                <span>Use your administrator credentials to continue.</span>
+            </div>
+            <form id="loginForm" class="login-form">
+                <label>
+                    <span>Username</span>
+                    <input type="text" id="username" name="username" required autocomplete="username">
+                </label>
+                <label>
+                    <span>Password</span>
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                </label>
+                <div id="errorMessage" class="error-message"></div>
+                <button type="submit" class="btn-login">Sign in</button>
+            </form>
+            <p class="login-footer">Default demo access: admin / admin123</p>
+        </section>
+    </main>
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>

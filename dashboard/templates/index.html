@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ session.get('csrf_token', '') }}">
+    <title>HOLO SECURITY Command Center</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <aside class="sidebar">
+        <a class="brand" href="/">
+            <span class="brand-mark">HS</span>
+            <span>
+                <strong>HOLO SECURITY</strong>
+                <small>Command Center</small>
+            </span>
+        </a>
+
+        <nav class="side-nav" aria-label="Primary">
+            <a class="active" href="#overview"><i class="fas fa-grid-2"></i><span>Overview</span></a>
+            <a href="#response"><i class="fas fa-shield-halved"></i><span>Response</span></a>
+            <a href="#analytics"><i class="fas fa-chart-line"></i><span>Analytics</span></a>
+            <a href="#telemetry"><i class="fas fa-network-wired"></i><span>Telemetry</span></a>
+        </nav>
+
+        <div class="license-panel">
+            <span class="status-dot"></span>
+            <div>
+                <strong>Enterprise Build</strong>
+                <p>Ready for web and mobile SOC teams.</p>
+            </div>
+        </div>
+    </aside>
+
+    <main class="workspace">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Network Defense Platform</p>
+                <h1>Security Operations Dashboard</h1>
+            </div>
+            <div class="top-actions">
+                <button class="icon-button" onclick="analyzeThreats()" title="Run AI analysis">
+                    <i class="fas fa-brain"></i>
+                    <span>Analyze</span>
+                </button>
+                <button class="icon-button" onclick="exportReport('csv')" title="Export CSV">
+                    <i class="fas fa-file-csv"></i>
+                    <span>CSV</span>
+                </button>
+                <button class="icon-button" onclick="exportReport('pdf')" title="Export PDF">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>PDF</span>
+                </button>
+                <a href="/logout" class="logout-button" title="Sign out">
+                    <i class="fas fa-arrow-right-from-bracket"></i>
+                    <span>Sign out</span>
+                </a>
+            </div>
+        </header>
+
+        <section id="overview" class="hero-panel">
+            <div>
+                <span class="pill"><i class="fas fa-satellite-dish"></i> Live SDN telemetry</span>
+                <h2>Enterprise threat visibility for products, sites, and managed devices.</h2>
+                <p>HOLO SECURITY monitors ARP spoofing, MAC movement, blocked endpoints, and controller state from one responsive command surface.</p>
+            </div>
+            <div class="health-strip">
+                <div>
+                    <span>Service</span>
+                    <strong>Online</strong>
+                </div>
+                <div>
+                    <span>Refresh</span>
+                    <strong>5s</strong>
+                </div>
+                <div>
+                    <span>User</span>
+                    <strong id="usernameDisplay">Admin</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-grid" aria-label="Security statistics">
+            <article class="stat-card danger">
+                <i class="fas fa-triangle-exclamation"></i>
+                <div>
+                    <span>Security Alerts</span>
+                    <strong id="totalAlerts">0</strong>
+                </div>
+            </article>
+            <article class="stat-card warning">
+                <i class="fas fa-ban"></i>
+                <div>
+                    <span>Blocked Hosts</span>
+                    <strong id="blockedHosts">0</strong>
+                </div>
+            </article>
+            <article class="stat-card info">
+                <i class="fas fa-diagram-project"></i>
+                <div>
+                    <span>Network Devices</span>
+                    <strong id="networkDevices">0</strong>
+                </div>
+            </article>
+            <article class="stat-card success" id="threatCard">
+                <i class="fas fa-shield-check"></i>
+                <div>
+                    <span>Threat Level</span>
+                    <strong id="threatLevel">LOW</strong>
+                </div>
+            </article>
+        </section>
+
+        <section id="response" class="control-grid">
+            <article class="panel response-panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Policy Control</p>
+                        <h2>Block Host</h2>
+                    </div>
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="block-form">
+                    <label>
+                        <span>IP Address</span>
+                        <input type="text" id="blockIP" placeholder="192.168.1.100" inputmode="numeric">
+                    </label>
+                    <label>
+                        <span>MAC Address</span>
+                        <input type="text" id="blockMAC" placeholder="00:11:22:33:44:55">
+                    </label>
+                    <button class="primary-action" onclick="blockHost()">
+                        <i class="fas fa-ban"></i>
+                        Block Endpoint
+                    </button>
+                </div>
+            </article>
+
+            <article class="panel blocked-panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Enforcement</p>
+                        <h2>Blocked Inventory</h2>
+                    </div>
+                    <button class="ghost-button" onclick="refreshData()" title="Refresh data">
+                        <i class="fas fa-rotate"></i>
+                    </button>
+                </div>
+                <div id="blockedIPsList" class="blocked-items"></div>
+                <div id="blockedMACsList" class="blocked-items"></div>
+            </article>
+        </section>
+
+        <section id="analytics" class="analytics-grid">
+            <article class="panel chart-panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Attack Mix</p>
+                        <h2>Detections by Type</h2>
+                    </div>
+                </div>
+                <div class="chart-box"><canvas id="attackTypeChart"></canvas></div>
+            </article>
+            <article class="panel chart-panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Detection Trend</p>
+                        <h2>Recent Alert Volume</h2>
+                    </div>
+                </div>
+                <div class="chart-box"><canvas id="attackTimeChart"></canvas></div>
+            </article>
+        </section>
+
+        <section class="panel" id="aiAnalysisCard" hidden>
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">AI Triage</p>
+                    <h2>Threat Analysis</h2>
+                </div>
+            </div>
+            <div id="aiAnalysisContent"></div>
+        </section>
+
+        <section id="telemetry" class="data-grid">
+            <article class="panel table-panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Incident Feed</p>
+                        <h2>Security Alerts</h2>
+                    </div>
+                    <button class="ghost-button" onclick="refreshData()" title="Refresh alerts">
+                        <i class="fas fa-rotate"></i>
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="alertsTable">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>IP</th>
+                                <th>MAC</th>
+                                <th>DPID</th>
+                                <th>Reason</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alertsTableBody">
+                            <tr><td colspan="7" class="empty-state">Loading telemetry...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="panel table-panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Network Map</p>
+                        <h2>ARP Table</h2>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="arpTable">
+                        <thead>
+                            <tr>
+                                <th>IP Address</th>
+                                <th>MAC Address</th>
+                                <th>Switch DPID</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="arpTableBody">
+                            <tr><td colspan="4" class="empty-state">Loading bindings...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
