@@ -1,12 +1,12 @@
 # Benchmarks
 
-All numbers below come from an actual run of [`tools/run_benchmarks.py`](../tools/run_benchmarks.py) (`test_run8` in `benchmarks/results/`), on a single Kali VM running Mininet + Open vSwitch + the controller + the dashboard together. 3 repetitions per scenario. Nothing here is hand-written or estimated — see the raw CSV for every individual repetition.
+All numbers below, except the ARP/IP Spoofing row (see footnote ¹), come from an actual run of [`tools/run_benchmarks.py`](../tools/run_benchmarks.py) (`test_run8` in `benchmarks/results/`), on a single Kali VM running Mininet + Open vSwitch + the controller + the dashboard together. 3 repetitions per scenario. Nothing here is hand-written or estimated — see the raw CSV for every individual repetition.
 
 ## Results
 
 | Scenario | n | Detection Rate | Label Accuracy | Attacker Blocked | Victim Also Blocked | Uninvolved Hosts Blocked (false positives) | Mean Detection Latency | Mean Block Latency | Mean CPU Overhead |
 |---|---|---|---|---|---|---|---|---|---|
-| ARP/IP Spoofing | — | 100%¹ | — | 100%¹ | — | 0¹ | — | — | — |
+| ARP/IP Spoofing | — | manual¹ | — | manual¹ | — | manual¹ | — | — | — |
 | SYN Flood | 3 | 100% | 100% | 100% | 100% | 0 | 7.68s | 10.59s | 0.06% |
 | UDP Flood | 3 | 100% | 100% | 100% | 0% | 0 | 6.82s | 9.87s | 0.17% |
 | ICMP Flood | 3 | 100% | 100% | 100% | 100% | 0 | 6.33s | 9.39s | 0.10% |
@@ -39,7 +39,7 @@ This number is **inflated by the test methodology**, not representative of a rea
 ```bash
 sudo python3 tools/run_benchmarks.py \
   --admin-password <your-password> \
-  --flood-script mininet_scripts/flood.py \
+  --flood-script mininet_script/flood.py \
   --flow-idle-timeout 10 \
   --scan-window-seconds 20 \
   --repetitions 3 \

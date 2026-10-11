@@ -35,6 +35,3 @@ shared/commands.json
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-
-# Benchmark generated outputs
-benchmarks/results/*.csv

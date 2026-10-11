@@ -2,7 +2,7 @@
 
 An SDN-based network security system built on Ryu (OpenFlow 1.3) that detects and automatically mitigates ARP/IP spoofing, SYN/UDP/ICMP flood (DDoS), and horizontal port/host scanning — with a real, online/incremental machine-learning layer on top, not a static rule engine dressed up as AI.
 
-Built as a final-semester computer engineering thesis project. Every number in this README comes from an actual run recorded by [`tools/run_benchmarks.py`](tools/run_benchmarks.py) on a real Mininet + Open vSwitch + Ryu setup — see [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for the raw CSVs and methodology.
+Built as a final-semester computer engineering thesis project. Every number in the results table below comes from an actual run (n=3) recorded by [`tools/run_benchmarks.py`](tools/run_benchmarks.py) on a real Mininet + Open vSwitch + Ryu setup — see [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for the raw CSVs and methodology.
 
 ## What it does
 
@@ -16,12 +16,14 @@ Built as a final-semester computer engineering thesis project. Every number in t
 
 | Scenario | Detection Rate | Label Accuracy | Attacker Blocked | False Positives | Mean Detection Latency |
 |---|---|---|---|---|---|
-| ARP/IP Spoofing | 100% | — | 100% | 0 | — |
+| ARP/IP Spoofing | manual check¹ | — | — | — | — |
 | SYN Flood | 100% | 100% | 100% | 0 | 7.68s |
 | UDP Flood | 100% | 100% | 100% | 0 | 6.82s |
 | ICMP Flood | 100% | 100% | 100% | 0 | 6.33s |
 | Horizontal Scan | 100% | 100% | 100% | 0 | 2.07s |
 | Legitimate multi-host traffic | — | — | — | **0% false alarm** | — |
+
+¹ Verified by hand during development; not part of the automated n=3 benchmark run.
 
 Scan detects faster because it fires on the first matching PacketIn; flood detection waits on the controller's periodic flow-stats poll (tunable, default every 3s). See [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) for the full methodology, caveats (e.g. why scan's *block* latency looks inflated in this specific test), and raw per-repetition data.
 
@@ -100,7 +102,7 @@ sudo python3 tools/run_benchmarks.py \
 ```
 controller/          Ryu SDN controller — detection + enforcement
 dashboard/            Flask web dashboard — visualization, manual control, AI analysis
-mininet_scripts/      Scapy-based attack traffic generator for testing
+mininet_script/      Scapy-based attack traffic generator for testing
 tools/                Automated benchmark harness
 docs/                 Architecture, install guide, benchmark methodology, limitations
 benchmarks/results/   Raw CSV output from real benchmark runs
